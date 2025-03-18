@@ -1,0 +1,124 @@
+<div class="todo-container">
+  <div class="todo-header">
+    <h1>Todo List</h1>
+    <p>Organize your tasks efficiently</p>
+  </div>
+
+  <form class="add-todo-form" (ngSubmit)="addTodo()">
+    <div class="form-group">
+      <input
+        type="text"
+        [(ngModel)]="newTodoTitle"
+        name="title"
+        placeholder="Enter todo title (required)"
+        [class.error]="titleError"
+        aria-label="Todo title"
+        aria-invalid="titleError ? 'true' : 'false'"
+        required
+      />
+      <div *ngIf="titleError" class="error-message" role="alert">{{ titleError }}</div>
+    </div>
+    <div class="form-group">
+      <textarea
+        [(ngModel)]="newTodoDescription"
+        name="description"
+        placeholder="Enter todo description (required)"
+        [class.error]="descriptionError"
+        aria-label="Todo description"
+        aria-invalid="descriptionError ? 'true' : 'false'"
+        required
+      ></textarea>
+      <div *ngIf="descriptionError" class="error-message" role="alert">{{ descriptionError }}</div>
+    </div>
+    <div class="form-group">
+      <select
+        [(ngModel)]="newTodoPriority"
+        name="priority"
+        aria-label="Todo priority"
+        required
+      >
+        <option value="low">Low Priority</option>
+        <option value="medium">Medium Priority</option>
+        <option value="high">High Priority</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <div class="file-input-container" [class.error]="fileError">
+        <div class="file-input-wrapper">
+          <input
+            type="file"
+            #fileInput
+            (change)="onFileSelected($event)"
+            aria-label="Attachment"
+            aria-invalid="fileError ? 'true' : 'false'"
+            class="file-input"
+            accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
+            required
+          >
+          <label for="fileInput" class="file-input-label">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <span>Choose a file (required)</span>
+          </label>
+        </div>
+        <div *ngIf="fileError" class="error-message" role="alert">{{ fileError }}</div>
+        
+        <div *ngIf="selectedFile" class="selected-file">
+          <i class="fas fa-file"></i>
+          <span class="file-name">{{ selectedFile.name }}</span>
+          <span class="file-size">{{ formatFileSize(selectedFile.size) }}</span>
+          <button class="remove-file" (click)="removeSelectedFile()" aria-label="Remove selected file">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    <button type="submit" class="add-todo-btn" aria-label="Add todo">Add Task</button>
+  </form>
+
+  <div class="todo-list">
+    <div *ngFor="let todo of todos" class="todo-item" [class.completed]="todo.completed">
+      <div class="checkbox-wrapper">
+        <input
+          type="checkbox"
+          [checked]="todo.completed"
+          (change)="toggleTodo(todo.id)"
+        />
+      </div>
+      <div class="todo-content">
+        <div class="todo-details">
+          <h3>{{ todo.title }}</h3>
+          <p *ngIf="todo.description">{{ todo.description }}</p>
+          <div class="priority-badge" [style.background-color]="getPriorityColor(todo.priority)">
+            {{ todo.priority }}
+          </div>
+          <div class="attachment-section" *ngIf="todo.attachment">
+            <div class="attachment-header">
+              <i class="fas fa-paperclip"></i>
+              <span>Attachment</span>
+            </div>
+            <div class="attachment-info">
+              <i class="fas fa-file"></i>
+              <span class="file-name">{{ todo.attachment.name }}</span>
+              <span class="file-size">{{ formatFileSize(todo.attachment.size) }}</span>
+              <div class="attachment-actions">
+                <button class="preview-button" (click)="previewFile(todo.attachment)" title="Preview file">
+                  <i class="fas fa-eye"></i>
+                </button>
+                <button class="remove-attachment" (click)="removeAttachment(todo.id)" title="Remove attachment">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="todo-actions">
+          <button class="delete-button" (click)="deleteTodo(todo.id)">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="empty-state" *ngIf="todos.length === 0">
+    <p>No tasks yet. Add your first task above!</p>
+  </div>
+</div> 
